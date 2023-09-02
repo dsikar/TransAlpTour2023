@@ -2,8 +2,12 @@ import xml.etree.ElementTree as ET
 import requests
 import os
 
-with open('API_KEY', 'r') as f:
+base_path = "/home/daniel/git/TransAlpTour2023/scripts/"
+api_key_path = os.path.join(base_path, 'API_KEY')
+
+with open(api_key_path, 'r') as f:
     API_KEY = f.readline().strip()
+
 
 # Replace with your actual API key
 BASE_URL = 'https://maps.googleapis.com/maps/api/elevation/json?locations={lat}%2C{lng}&key={api_key}'
@@ -25,22 +29,30 @@ def get_elevation(lat, lng):
     return None
 
 def main():
+    base_path = "/home/daniel/git/TransAlpTour2023/data/"
     gpx_files = [
-        "/home/daniel/Downloads/Day01GenevaToRiddes160km.gpx",
-        "/home/daniel/Downloads/Day02SionToAndermatt161km.gpx",
-        "/home/daniel/Downloads/Day03AndermattToTriesen135km.gpx",
-        "/home/daniel/Downloads/Day04TriesenToElmen121km.gpx",
-        "/home/daniel/Downloads/Day05ElmenToHausem137km.gpx",
-        "/home/daniel/Downloads/Day06HausernToZell-am-See-Sud124km.gpx",
-        "/home/daniel/Downloads/Day07Zell-am-See-SudToSpitall-an-der-Drau156km.gpx",
-        "/home/daniel/Downloads/Day08Spitall-an-der-DrauToLjubljana175km.gpx",
-        "/home/daniel/Downloads/Day09LjubljanaToCrikvenica159km.gpx",
-        "/home/daniel/Downloads/Day10CrikvenicaToPag119km.gpx",
-        "/home/daniel/Downloads/Day11PagToZadar51km.gpx"
-    ]    
+        os.path.join(base_path, "Day01GenevaToRiddes160km.gpx"),
+        os.path.join(base_path, "Day02SionToAndermatt161km.gpx"),
+        os.path.join(base_path, "Day03AndermattToTriesen135km.gpx"),
+        os.path.join(base_path, "Day04TriesenToElmen121km.gpx"),
+        os.path.join(base_path, "Day05ElmenToHausem137km.gpx"),
+        os.path.join(base_path, "Day06HausernToZell-am-See-Sud124km.gpx"),
+        os.path.join(base_path, "Day07Zell-am-See-SudToSpitall-an-der-Drau156km.gpx"),
+        os.path.join(base_path, "Day08Spitall-an-der-DrauToLjubljana175km.gpx"),
+        os.path.join(base_path, "Day09LjubljanaToCrikvenica159km.gpx"),
+        os.path.join(base_path, "Day10CrikvenicaToPag119km.gpx"),
+        os.path.join(base_path, "Day11PagToZadar51km.gpx")
+    ]
     for gpx_file in gpx_files:
+        print(f"Processing file: {gpx_file}")
         coords = extract_lat_lng_from_gpx(gpx_file)
-        elevations = [get_elevation(lat, lng) for lat, lng in coords]
+        print(f"Extracted {len(coords)} coordinates from {gpx_file}")
+
+        elevations = []
+        for lat, lng in coords:
+            elevation = get_elevation(lat, lng)
+            elevations.append(elevation)
+            print(f"Retrieved elevation {elevation} meters for Latitude: {lat}, Longitude: {lng}")
         
         # Write data to a new file
         output_file = os.path.splitext(gpx_file)[0] + '_with_elevation.txt'
